@@ -190,6 +190,8 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Photos\15aa0697-424d-4fb8-adda-31973a83ef5d.Jpeg" />
+    <Content Include="Photos\3764ff65-c6d3-485f-ab01-4b37778b1bab.Jpeg" />
     <Content Include="Photos\Loading_icon.gif" />
     <Content Include="Photos\No_image.png" />
     <Content Include="Photos\Thumbnails\15aa0697-424d-4fb8-adda-31973a83ef5d.Jpeg" />

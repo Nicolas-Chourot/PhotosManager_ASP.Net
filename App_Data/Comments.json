@@ -1,0 +1,16 @@
+[
+	{
+		"Id": 1,
+		"PhotoId": 1,
+		"UserId": 1,
+		"CreationDate": "2021-04-28T17:22:45.235767-04:00",
+		"Text": "Vraiment cute"
+	},
+	{
+		"Id": 2,
+		"PhotoId": 2,
+		"UserId": 1,
+		"CreationDate": "2021-04-28T17:23:43.7702828-04:00",
+		"Text": "Je l'ai trouvé"
+	}
+]

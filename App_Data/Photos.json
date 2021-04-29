@@ -1,0 +1,22 @@
+[
+  {
+    "Id": 1,
+    "PhotoId": "15aa0697-424d-4fb8-adda-31973a83ef5d",
+    "UserId": 1,
+    "Title": "Radio-Canada",
+    "Description": "Ancien logo de Radio-Canada",
+    "CreationDate": "2021-04-28T17:22:18.1152353-04:00",
+    "RatingAverage": 3.0,
+    "NbRatings": 1
+  },
+  {
+    "Id": 2,
+    "PhotoId": "3764ff65-c6d3-485f-ab01-4b37778b1bab",
+    "UserId": 1,
+    "Title": "Trouvez le chat",
+    "Description": "Image comique",
+    "CreationDate": "2021-04-28T17:23:28.1001686-04:00",
+    "RatingAverage": 4.0,
+    "NbRatings": 1
+  }
+]

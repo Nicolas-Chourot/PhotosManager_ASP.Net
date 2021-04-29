@@ -1,0 +1,111 @@
+﻿@helper Icon(string id, string Icon, string TooltipMessage, string ToolTipPlacement = "bottom", string css = "")
+{
+    string cssClass = "Icon";
+    if (!string.IsNullOrEmpty(css))
+    {
+        cssClass = cssClass + " " + css;
+    }
+    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
+    <img src='@Url.Content(@"~/Content/UI_Images/" + Icon + ".png")'
+         class="@cssClass" data-toggle="tooltip"
+         data-placement="@ToolTipPlacement"
+         title="@TooltipMessage"
+         id="@id" />
+
+}
+
+@helper IconAction(string Action, string Icon, string TooltipMessage, string ToolTipPlacement = "bottom")
+{
+    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
+    <a href="@Url.Action(Action)" class="noUnderLine">
+        <img src='@Url.Content(@"~/Content/UI_Images/" + Icon + ".png")'
+             class="Icon" data-toggle="tooltip"
+             data-placement="@ToolTipPlacement"
+             title="@TooltipMessage" />
+    </a>
+}
+
+@helper IconActionController(string Action, string controller, string Icon, string TooltipMessage, string ToolTipPlacement = "bottom")
+{
+    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
+    <a href="@Url.Action(Action, controller)" class="noUnderLine">
+        <img src='@Url.Content(@"~/Content/UI_Images/" + Icon + ".png")'
+             class="Icon" data-toggle="tooltip"
+             data-placement="@ToolTipPlacement"
+             title="@TooltipMessage" />
+    </a>
+}
+
+@helper ImageFixedSize(string url, string about)
+{
+    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
+    url = Url.Content(url);
+    <div class="photoFixedSize">
+        <div class="photoContainerFixedSize"
+             style="background: url(@url) no-repeat center center; background-size: contain;"
+             data-toggle="tooltip" title="@about"> </div>
+    </div>
+}
+
+
+@helper Avatar(string url, string about)
+{
+    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
+    url = Url.Content(url);
+
+    <div class="avatar"
+         style="background: url(@url) no-repeat center center; background-size: cover;"
+         data-toggle="tooltip" title="@about"> </div>
+}
+
+@helper ImageUploader(int id, string imageSrc, string controlId = "ImageControl", string waitingImage = "", string TooltipMessage = "", string ToolTipPlacement = "bottom")
+{
+    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
+    imageSrc = Url.Content(imageSrc);
+    controlId = Url.Content(controlId);
+    waitingImage = Url.Content(waitingImage);
+    <fieldset>
+        <div class='imageUploader' id='@id' controlId='@controlId' imageSrc='@imageSrc' waitingImage='@waitingImage'
+             data-toggle="tooltip"
+             data-placement="@ToolTipPlacement"
+             title="@TooltipMessage"> </div>
+    </fieldset>
+}
+
+@helper RatingBar(string fieldName, double value = 0, bool readOnly = false)
+{
+    int integer = (int)Math.Round(value);
+    if (readOnly)
+    {
+        <input name="@fieldName" id="@fieldName" value=@integer class="RatingBar" disabled style="width:0px;display:none" />
+    }
+    else
+    {
+        <input name="@fieldName" id="@fieldName" value=@integer class="RatingBar" style="width:0px;display:none" />
+    }
+}
+
+
+@helper ImageThumbnail(string title, string url, string about)
+{
+    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
+    url = Url.Content(url);
+    <div class="photo">
+        @title
+        <div class="photoThumbnailContainer"
+             style="background: url(@url) no-repeat center center; background-size: cover;"
+             data-toggle="tooltip" title="@about"> </div>
+    </div>
+}
+
+@helper ImageThumbnailWithRating(string id, float rating, int nb_rating, string url, string about)
+{
+    var Url = new System.Web.Mvc.UrlHelper(HttpContext.Current.Request.RequestContext);
+    url = Url.Content(url);
+    <div class="photo">
+        @Helper.RatingBar("rater_" + id, rating, true) &nbsp;<span>@nb_rating</span><br />
+        <div class="photoThumbnailContainer"
+             style="background: url(@url) no-repeat center center; background-size: cover;"
+             data-toggle="tooltip" title="@about"> </div>
+    </div>
+}

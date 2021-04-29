@@ -1,0 +1,33 @@
+﻿@model IEnumerable<PhotosManager.Models.User>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+    <h2>
+        Usagers en ligne
+        @Helper.IconActionController("Index", "Photos", "go-back-icon", "Retour")
+    </h2>
+
+<table class="table-condensed">
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            <a href="@Url.Action("LogAs/" + item.Id)">
+                @if (PhotosManager.Models.OnlineUsers.IsOnLine(item.Id))
+                {
+                    <img src="@Url.Content("~/Content/UI_Images/OnLine.png")" class="SmallIcon">
+                }
+                else
+                {
+                    <img src="@Url.Content("~/Content/UI_Images/OffLine.png")" class="SmallIcon">
+                }
+            </a>
+            &nbsp;
+            
+            <td>@Helper.Avatar(item.GetAvatarURL(), "")</td><td>&nbsp;@item.FullName()</td>
+    </tr>
+}
+
+</table>

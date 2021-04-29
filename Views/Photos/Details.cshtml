@@ -1,0 +1,217 @@
+﻿@model PhotosManager.Models.Photo
+
+@{
+    ViewBag.Title = "Détails";
+}
+
+
+<table class="table-condensed">
+    <tr>
+        <td>
+            <h2>
+                Détails
+                @Helper.IconAction("Previous/" + Model.Id, "previous-icon", "Détails de la photo précédente")
+                @Helper.IconAction("Next/" + Model.Id, "next-icon", "Détails de la photo suivante")
+                @if (ViewBag.IsOwner || ViewBag.IsAdmin)
+                {
+                    @Helper.IconAction("Edit/" + Model.Id, "edit-icon", "Modifier " + Model.Title)
+                    @Helper.IconAction("Delete/" + Model.Id, "delete-icon", "Effacer " + Model.Title)
+                }
+                @Helper.IconAction("Index", "go-back-icon", "Retour")
+            </h2>
+        </td>
+
+    </tr>
+</table>
+
+<style>
+    dd {
+        margin-bottom: 10px;
+        vertical-align: central;
+    }
+</style>
+
+
+<div>
+
+    <hr />
+
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt>Évaluations</dt>
+        <dd>
+            <div id="RatingAverageContainer">
+            </div>
+        </dd>
+
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+        }
+        <dt>
+            @Html.DisplayNameFor(model => model.CreationDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreationDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayName("Propriétaire")
+        </dt>
+
+        <dd>
+            <table><tr><td>@Helper.Avatar(Model.GetOwnerAvatar(), "")</td><td>&nbsp;@Model.GetOwnerName()</td></tr> </table>
+        </dd>
+
+    </dl>
+</div>
+@Html.HiddenFor(model => model.Id)
+<a href="@Url.Content(Model.GetPhotoURL())" target="_blank">
+    @Helper.ImageFixedSize(Url.Content(Model.GetPhotoURL()), "Voir en grandeur originale.")
+</a>
+<br />
+<table>
+    <tr>
+        <td style="font-weight:bold; font-size:medium">Votre évaluation&nbsp;</td>
+        <td>@Helper.RatingBar("Rating", (int)ViewBag.UserRating)</td>
+    </tr>
+</table>
+<hr />
+<h3>Commentaires</h3>
+<hr />
+<div class="newCommentContainer">
+    <textarea type="text" id="comment" placeholder="nouveau commentaire" class="comment form-control" maxlength="512"></textarea>
+    @Helper.Icon("add-comment", "add-icon", "Ajouter ce commentaire")
+</div>
+<hr />
+<div id="commentsContainersGrid"> </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+         $(function () {
+             InstallPeriodicRefreshTask();
+             $("#add-comment").click(function () {
+                 CreateComment();
+             });
+             $("#comment").keypress(function (e) {
+                 let key = e.keyCode;
+                 if (key === 13)
+                     CreateComment();
+             });
+             $(".star").click(function () { ChangeRating(); });
+         })
+
+        function InstallPeriodicRefreshTask() {
+            RefreshCommentsList();
+            RefreshRatingAverage();
+
+            setInterval(function () {
+                CheckIfMustRefreshComments();
+                CheckIfMustRefreshRatings();
+            }, 3000);
+        }
+
+        function ChangeRating() {
+            let newRating = $(".RatingBarContainer .fullStar").length;
+            let url = "@Url.Action("Change","Ratings")";
+            $.ajax({
+                 type: "POST",
+                 url: url,
+                 data: {PhotoId : $("#Id").val(), Value : newRating},
+                 success: function (response) {
+                      RefreshRatingAverage();
+                 }
+            });
+        }
+
+        function CreateComment() {
+            let r = $("#comment").val().replace(/[^\x00-\xFF]/g, "");
+            $("#comment").val(r);
+            let url = "@Url.Action("Create","Comments")";
+            $.ajax({
+                 type: "POST",
+                 url: url,
+                 data: {PhotoId : $("#Id").val(), Text : $("#comment").val()},
+                 success: function (response) {
+                     $("#comment").val("");
+                     RefreshCommentsList();
+                 }
+            });
+        }
+        function DeleteComment(id) {
+            let url = "@Url.Action("Delete","Comments")";
+             $.ajax({
+                 type: "POST",
+                 url: url,
+                 data: {id : id},
+                 success: function (response) {
+                     RefreshCommentsList();
+                 }
+            });
+        }
+
+        function CheckIfMustRefreshComments() {
+             $.ajax({
+                type: "GET",
+                url: "@Url.Action("MustRefresh","Comments")",
+                 success: function (response) {
+                     if (response.mustRefresh)
+                        RefreshCommentsList();
+                }
+            });
+        }
+        function CheckIfMustRefreshRatings() {
+             $.ajax({
+                type: "GET",
+                url: "@Url.Action("MustRefresh","Ratings")",
+                 success: function (response) {
+                     if (response.mustRefresh)
+                        RefreshRatingAverage();
+                }
+            });
+        }
+        function RefreshCommentsList() {
+            let url = "@Url.Action("CommentsList","Comments")" + "?photoId=" + $("#Id").val();
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "html",
+                success: function (html) {
+                    $("#commentsContainersGrid").html(html);
+                    $(".delete-comment").click(function () {
+                        let id = $(this).attr("id").split("_")[1];
+                        if (confirm("Effacer ce commentaire?"))
+                            DeleteComment(id);
+                    });
+                }
+            });
+        }
+
+        function RefreshRatingAverage() {
+            let url = "@Url.Action("RatingsAverage","Ratings")" + "?photoId=" + $("#Id").val();
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "html",
+                success: function (html) {
+                    $("#RatingAverageContainer").html(html);
+                    BindRatingBar("Average");
+                }
+            });
+        }
+    </script>
+}

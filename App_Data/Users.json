@@ -1,0 +1,18 @@
+[
+	{
+		"Id": 1,
+		"FirstName": "Site",
+		"LastName": "Admin",
+		"Password": "GP_2021",
+		"Admin": true,
+		"AvatarId": "9114d2ce-df1f-49c0-bd6d-a09c34685123"
+	},
+	{
+		"Id": 2,
+		"FirstName": "Etudiant",
+		"LastName": "CLG",
+		"Password": "clg2021",
+		"Admin": false,
+		"AvatarId": "0c108440-4ba2-495f-b84a-235cec25da35"
+	}
+]

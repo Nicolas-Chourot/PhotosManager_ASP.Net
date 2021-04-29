@@ -1,0 +1,18 @@
+﻿@model IEnumerable<PhotosManager.Models.Photo>
+@foreach (var photo in Model)
+{
+    <a href="@Url.Action("Details/" + photo.Id.ToString())">
+        @switch ((int)ViewBag.SortType)
+        {
+            case 0: /*sort by Title*/
+                @Helper.ImageThumbnail(photo.Title, photo.GetPhotoURL(true), photo.Description)
+                break;
+            case 1: /*sort by Creation date*/
+                @Helper.ImageThumbnail(photo.CreationDate.ToShortDateString(), photo.GetPhotoURL(true), photo.Description)
+                break;
+            case 2: /*sort Ratings*/
+                @Helper.ImageThumbnailWithRating(photo.Id.ToString(), photo.RatingAverage, photo.NbRatings, photo.GetPhotoURL(true), photo.Description)
+                break;
+        }
+    </a>
+}

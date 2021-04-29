@@ -1,0 +1,175 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<br />
+
+<div class="filterPhotosGrid">
+    @Helper.IconAction("Create", "add-icon", "Ajouter une photo")
+    <!-- Search input -->
+    <!-- Search type button -->
+    @switch ((int)ViewBag.SearchType)
+    {
+        case 0: /*searh by keywords*/
+            <input type="search" id="tags" class="form-control" value="@((string)ViewBag.SearchTags)" placeholder="recherche par mot-clés" maxlength="64" />
+            <select id="Owners" class="form-control hidden"></select>
+            @Helper.Icon("btn-toogle-search-type", "keyword-search-icon", "changement de type de recherche")
+            break;
+        case 1: /*search by user*/
+            <input type="search" id="tags" class="form-control hidden" value="@((string)ViewBag.SearchTags)" placeholder="recherche par mot-clés" maxlength="64" />
+            <select id="Owners" class="form-control"></select>
+            @Helper.Icon("btn-toogle-search-type", "user-search-icon", "changement de type de recherche")
+            break;
+    }
+    <!-- Toogle Sort type button -->
+    @switch ((int)ViewBag.SortType)
+    {
+        case 0: /*sort by Title*/
+            @Helper.Icon("btn-toogle-sort-type", "sort-text-icon", "changement de type de tri")
+            break;
+        case 1: /*sort by Creation date*/
+            @Helper.Icon("btn-toogle-sort-type", "sort-date-icon", "changement de type de tri")
+            break;
+        case 2: /*sort Ratings*/
+            @Helper.Icon("btn-toogle-sort-type", "sort-rating-icon", "changement de type de tri")
+            break;
+    }
+    <!-- Toogle Sort button -->
+    @if ((bool)ViewBag.SortAscending)
+    {
+        @Helper.Icon("btn-toogle-sort", "sort-ascending-icon", "trier")
+    }
+    else
+    {
+        @Helper.Icon("btn-toogle-sort", "sort-descending-icon", "trier")
+    }
+</div>
+<hr />
+<div id="photoContainersGrid" class="photoContainersGrid"> </div>
+
+@section Scripts {
+    <script>
+        $(function () {
+             PeriodicRefreshTasks();
+             $("#btn-toogle-sort-type").click(function () {
+                ToogleSortType();
+             });
+             $("#btn-toogle-sort").click(function () {
+                ToogleSort();
+             });
+             $("#btn-toogle-search-type").click(function () {
+                ToogleSearchType();
+             });
+             $("#tags").on('search', function (e) {
+                 SearchByTags($(this).val());
+             });
+             $("#tags").keypress(function (e) {
+                 let key = e.keyCode;
+                 if (key === 13)
+                     SearchByTags($(this).val());
+             });
+             $("#Owners").change('search',function (e) {
+                SearchByOwner($(this).val());
+             })
+         })
+        function PeriodicRefreshTasks() {
+             RefreshPicturesList();
+             RefreshOwnersList();
+
+             setInterval(function () {
+                 RefreshPicturesList();
+                 RefreshOwnersList();
+             }, 3000);
+        }
+        function ToogleSort() {
+             $.ajax({
+                type: "GET",
+                url: "@Url.Action("ToogleSort")",
+                success: function (response) {
+                    if (response.SortAscending)
+                        $("#btn-toogle-sort").attr("src", '@Url.Content("~/Content/UI_Images/sort-ascending-icon.png")');
+                    else
+                        $("#btn-toogle-sort").attr("src", '@Url.Content("~/Content/UI_Images/sort-descending-icon.png")');
+                    RefreshPicturesList();
+                }
+            });
+        }
+        function ToogleSearchType() {
+             $.ajax({
+                type: "GET",
+                url: "@Url.Action("ToogleSearchType")",
+                 success: function (response) {
+                     switch (response.SearchType) {
+                         case 0: $("#btn-toogle-search-type").attr("src", '@Url.Content("~/Content/UI_Images/keyword-search-icon.png")');
+                             $("#tags").removeClass("hidden");
+                             $("#Owners").addClass("hidden");
+                             break;
+                         case 1: $("#btn-toogle-search-type").attr("src", '@Url.Content("~/Content/UI_Images/user-search-icon.png")');
+                              $("#tags").addClass("hidden");
+                              $("#Owners").removeClass("hidden");
+                             break;
+                     }
+                     RefreshPicturesList();
+                }
+            });
+        }
+        function ToogleSortType() {
+             $.ajax({
+                type: "GET",
+                url: "@Url.Action("ToogleSortType")",
+                 success: function (response) {
+                     switch (response.SortType) {
+                         case 0: $("#btn-toogle-sort-type").attr("src", '@Url.Content("~/Content/UI_Images/sort-text-icon.png")'); break;
+                         case 1: $("#btn-toogle-sort-type").attr("src", '@Url.Content("~/Content/UI_Images/sort-date-icon.png")'); break;
+                         case 2: $("#btn-toogle-sort-type").attr("src", '@Url.Content("~/Content/UI_Images/sort-rating-icon.png")'); break;
+                     }
+                     RefreshPicturesList();
+                }
+            });
+        }
+        function SearchByTags(tags) {
+            let url = "@Url.Action("SearchByTags")" + "?tags=" + tags;
+             $.ajax({
+                type: "GET",
+                url: url,
+                success: function (response) { RefreshPicturesList(); }
+            });
+        }
+        function SearchByOwner(ownerId) {
+            let url = "@Url.Action("SearchByOwner")" + "?id=" + ownerId;
+             $.ajax({
+                type: "GET",
+                url: url,
+                success: function (response) { RefreshPicturesList(); }
+            });
+        }
+        function RefreshOwnersList() {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("OwnersList")",
+                dataType: "json", // if json result is null success clause wont be called
+                success: function (owners) {
+                    $("#Owners").empty();
+                    $("#Owners").append("<option value='0'>Tous les usagers</option>");
+                    for (let o = 0; o < owners.length; o++) {
+                        let onlineChar = "🔵";
+                        let offlineChar = "🔴";
+                        $("#Owners").append("<option value='" + owners[o].id + "'" + (owners[o].selected ? " selected >" : ">") + (owners[o].online?onlineChar:offlineChar) + " " + owners[o].name + "</option>");
+                    }
+                }
+            });
+        }
+        function RefreshPicturesList() {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("PhotosList")",
+                dataType: "html",
+                success: function (html) {
+                    if (html !== "") {
+                        $("#photoContainersGrid").html(html);
+                        BindRatingBars();
+                    }
+                }
+            });
+        }
+    </script>
+}

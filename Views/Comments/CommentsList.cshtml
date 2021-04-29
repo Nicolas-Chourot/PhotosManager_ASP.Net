@@ -1,0 +1,37 @@
+﻿@model IEnumerable<PhotosManager.Models.CommentView>
+
+@{
+    string currentDate = DateTime.Now.ToShortDateString();
+    bool alternateBG = true;
+    foreach (var item in Model)
+    {
+        alternateBG = !alternateBG;
+        string itemDate = item.CreationDate.ToShortDateString();
+        if (itemDate != currentDate)
+        {
+            currentDate = itemDate;
+            <div class="commentDate">@currentDate</div>
+            <br />
+        }
+
+        string itemTime = item.CreationDate.ToShortTimeString();
+        <div class="newCommentContainer">
+            <div class="commentTimeOwnerContainer"  style="background-color:@(alternateBG?"GhostWhite":"Azure")">
+                <div class="commentTime">@itemTime</div>
+                <div class="commentOwnerName">@item.OwnerName</div>
+                <div>@Helper.Avatar(item.AvatarUrl,"")</div>
+                <div class="commentText">@item.Text</div>
+            </div>
+
+            @if (item.CanDelete)
+            {
+                @Helper.Icon("delete-comment_" + item.Id, "delete-icon", "Effacer ce commentaire", "bottom", "delete-comment")
+            }
+            else
+            {
+            <div>&nbsp;</div>
+            }
+        </div>
+ 
+    }
+}
